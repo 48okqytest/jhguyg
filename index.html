@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuckySpin - Play for Fun</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">Lucky<span>Spin</span></div>
+            <div class="balance-box">
+                <i class="fas fa-coins"></i>
+                <span id="balance">1000</span>
+                <div class="balance-actions">
+                    <button id="add-balance"><i class="fas fa-plus"></i></button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="game-selector">
+                <button class="game-tab active" data-game="slots">Slots</button>
+                <button class="game-tab" data-game="rocket">Rocket</button>
+                <button class="game-tab" data-game="coinflip">Coin Flip</button>
+            </div>
+
+            <div class="game-container">
+                <!-- Slots Game -->
+                <div class="game active" id="slots-game">
+                    <div class="slots-container">
+                        <div class="slots-reel" id="reel1">7</div>
+                        <div class="slots-reel" id="reel2">7</div>
+                        <div class="slots-reel" id="reel3">7</div>
+                    </div>
+                    <div class="bet-controls">
+                        <div class="bet-amount">
+                            <button class="bet-btn" data-amount="-10">-</button>
+                            <span id="slots-bet">10</span>
+                            <button class="bet-btn" data-amount="10">+</button>
+                        </div>
+                        <button id="spin-btn" class="action-btn">SPIN</button>
+                    </div>
+                    <div class="result-message" id="slots-result"></div>
+                </div>
+
+                <!-- Rocket Game -->
+                <div class="game" id="rocket-game">
+                    <div class="rocket-container">
+                        <div class="rocket" id="rocket">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div class="rocket-track">
+                            <div class="multiplier-markers">
+                                <span>1x</span>
+                                <span>2x</span>
+                                <span>5x</span>
+                                <span>10x</span>
+                                <span>50x</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bet-controls">
+                        <div class="bet-amount">
+                            <button class="bet-btn" data-amount="-10">-</button>
+                            <span id="rocket-bet">10</span>
+                            <button class="bet-btn" data-amount="10">+</button>
+                        </div>
+                        <button id="launch-btn" class="action-btn">LAUNCH</button>
+                        <button id="cashout-btn" class="action-btn secondary" disabled>CASHOUT 1x</button>
+                    </div>
+                    <div class="result-message" id="rocket-result"></div>
+                </div>
+
+                <!-- Coin Flip Game -->
+                <div class="game" id="coinflip-game">
+                    <div class="coin-container">
+                        <div class="coin" id="coin">
+                            <div class="coin-front">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="coin-back">
+                                <i class="fas fa-bitcoin"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="coin-choices">
+                        <button class="coin-choice" data-choice="heads">
+                            <i class="fas fa-dollar-sign"></i> Heads
+                        </button>
+                        <button class="coin-choice" data-choice="tails">
+                            <i class="fas fa-bitcoin"></i> Tails
+                        </button>
+                    </div>
+                    <div class="bet-controls">
+                        <div class="bet-amount">
+                            <button class="bet-btn" data-amount="-10">-</button>
+                            <span id="coin-bet">10</span>
+                            <button class="bet-btn" data-amount="10">+</button>
+                        </div>
+                        <button id="flip-btn" class="action-btn" disabled>FLIP</button>
+                    </div>
+                    <div class="result-message" id="coin-result"></div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>This is a fake gambling website for entertainment purposes only. No real money is used or won.</p>
+        </footer>
+    </div>
+
+    <div class="modal" id="add-balance-modal">
+        <div class="modal-content">
+            <h3>Add Play Money</h3>
+            <div class="balance-options">
+                <button class="balance-option" data-amount="500">+500</button>
+                <button class="balance-option" data-amount="1000">+1000</button>
+                <button class="balance-option" data-amount="5000">+5000</button>
+            </div>
+            <button class="close-modal">&times;</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
