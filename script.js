@@ -20,24 +20,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const confettiContainer = document.getElementById('confetti');
 
     // Initialize particles.js
-    particlesJS('particles-js', {
-        particles: {
-            number: { value: 80, density: { enable: true, value_area: 800 } },
-            color: { value: "#6c5ce7" },
-            shape: { type: "circle" },
-            opacity: { value: 0.5, random: true },
-            size: { value: 3, random: true },
-            line_linked: { enable: true, distance: 150, color: "#6c5ce7", opacity: 0.3, width: 1 },
-            move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out" }
-        },
-        interactivity: {
-            detect_on: "canvas",
-            events: {
-                onhover: { enable: true, mode: "repulse" },
-                onclick: { enable: true, mode: "push" }
+    if (typeof particlesJS !== 'undefined') {
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#6c5ce7" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: "#6c5ce7", opacity: 0.3, width: 1 },
+                move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out" }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
             }
-        }
-    });
+        });
+    }
 
     // Initialize the app
     init();
@@ -64,7 +66,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Add active class to clicked tab and corresponding game
                 this.classList.add('active');
                 currentGame = this.dataset.game;
-                document.getElementById(`${currentGame}-game`).classList.add('active');
+                const gameElement = document.getElementById(`${currentGame}-game`);
+                if (gameElement) {
+                    gameElement.classList.add('active');
+                }
                 
                 // Reset any game states when switching
                 resetRocketGame();
@@ -520,12 +525,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function triggerConfetti() {
-        confetti({
-            particleCount: 150,
-            spread: 70,
-            origin: { y: 0.6 },
-            colors: ['#6c5ce7', '#00cec9', '#fdcb6e', '#00b894']
-        });
+        if (typeof confetti === 'function') {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#6c5ce7', '#00cec9', '#fdcb6e', '#00b894']
+            });
+        }
     }
 
     function triggerFloatingCoins(count) {
