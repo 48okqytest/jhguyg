@@ -7,11 +7,15 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
+        <div class="particles" id="particles-js"></div>
+        <div class="confetti-container" id="confetti"></div>
+        
         <header>
-            <div class="logo">Lucky<span>Spin</span></div>
+            <div class="logo">LUCKY<span>SPIN</span></div>
             <div class="balance-box">
                 <i class="fas fa-coins"></i>
                 <span id="balance">1000</span>
@@ -23,9 +27,15 @@
 
         <main>
             <div class="game-selector">
-                <button class="game-tab active" data-game="slots">Slots</button>
-                <button class="game-tab" data-game="rocket">Rocket</button>
-                <button class="game-tab" data-game="coinflip">Coin Flip</button>
+                <button class="game-tab active" data-game="slots">
+                    <i class="fas fa-slots"></i> Slots
+                </button>
+                <button class="game-tab" data-game="rocket">
+                    <i class="fas fa-rocket"></i> Rocket
+                </button>
+                <button class="game-tab" data-game="coinflip">
+                    <i class="fas fa-coins"></i> Coin Flip
+                </button>
             </div>
 
             <div class="game-container">
@@ -42,7 +52,9 @@
                             <span id="slots-bet">10</span>
                             <button class="bet-btn" data-amount="10">+</button>
                         </div>
-                        <button id="spin-btn" class="action-btn">SPIN</button>
+                        <button id="spin-btn" class="action-btn">
+                            <i class="fas fa-redo"></i> SPIN
+                        </button>
                     </div>
                     <div class="result-message" id="slots-result"></div>
                 </div>
@@ -69,8 +81,12 @@
                             <span id="rocket-bet">10</span>
                             <button class="bet-btn" data-amount="10">+</button>
                         </div>
-                        <button id="launch-btn" class="action-btn">LAUNCH</button>
-                        <button id="cashout-btn" class="action-btn secondary" disabled>CASHOUT 1x</button>
+                        <button id="launch-btn" class="action-btn">
+                            <i class="fas fa-paper-plane"></i> LAUNCH
+                        </button>
+                        <button id="cashout-btn" class="action-btn secondary" disabled>
+                            <i class="fas fa-hand-holding-usd"></i> CASHOUT 1x
+                        </button>
                     </div>
                     <div class="result-message" id="rocket-result"></div>
                 </div>
@@ -101,7 +117,9 @@
                             <span id="coin-bet">10</span>
                             <button class="bet-btn" data-amount="10">+</button>
                         </div>
-                        <button id="flip-btn" class="action-btn" disabled>FLIP</button>
+                        <button id="flip-btn" class="action-btn" disabled>
+                            <i class="fas fa-sync-alt"></i> FLIP
+                        </button>
                     </div>
                     <div class="result-message" id="coin-result"></div>
                 </div>
@@ -117,14 +135,26 @@
         <div class="modal-content">
             <h3>Add Play Money</h3>
             <div class="balance-options">
-                <button class="balance-option" data-amount="500">+500</button>
-                <button class="balance-option" data-amount="1000">+1000</button>
-                <button class="balance-option" data-amount="5000">+5000</button>
+                <button class="balance-option" data-amount="500">
+                    <i class="fas fa-coins"></i> +500
+                </button>
+                <button class="balance-option" data-amount="1000">
+                    <i class="fas fa-coins"></i> +1000
+                </button>
+                <button class="balance-option" data-amount="5000">
+                    <i class="fas fa-coins"></i> +5000
+                </button>
             </div>
             <button class="close-modal">&times;</button>
         </div>
     </div>
 
+    <div class="sad-face" id="sad-face">
+        <div class="face">😢</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
