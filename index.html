@@ -8,10 +8,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Simplified background that won't interfere */
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Ensure game tabs are clickable */
+        .game-tab {
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Make sure game containers are above any background */
+        .game-container {
+            position: relative;
+            z-index: 5;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <div class="particles" id="particles-js"></div>
+        <!-- Removed particles.js container -->
         <div class="confetti-container" id="confetti"></div>
         
         <header>
@@ -153,57 +175,51 @@
         <div class="face">😢</div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Game tab switching functionality
-        const gameTabs = document.querySelectorAll('.game-tab');
-        const games = document.querySelectorAll('.game');
-        
-        gameTabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                // Remove active class from all tabs and games
-                gameTabs.forEach(t => t.classList.remove('active'));
-                games.forEach(g => g.classList.remove('active'));
-                
-                // Add active class to clicked tab and corresponding game
-                this.classList.add('active');
-                const gameId = this.getAttribute('data-game');
-                document.getElementById(`${gameId}-game`).classList.add('active');
-            });
-        });
-
-        // Make sure all external scripts are loaded
-        function ensureScriptsLoaded() {
-            if (typeof particlesJS === 'function' && typeof confetti === 'function') {
-                // Initialize particles.js if it's loaded
-                particlesJS('particles-js', {
-                    particles: {
-                        number: { value: 80, density: { enable: true, value_area: 800 } },
-                        color: { value: "#6c5ce7" },
-                        shape: { type: "circle" },
-                        opacity: { value: 0.5, random: true },
-                        size: { value: 3, random: true },
-                        line_linked: { enable: true, distance: 150, color: "#6c5ce7", opacity: 0.3, width: 1 },
-                        move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out" }
-                    },
-                    interactivity: {
-                        detect_on: "canvas",
-                        events: {
-                            onhover: { enable: true, mode: "repulse" },
-                            onclick: { enable: true, mode: "push" }
-                        }
+        // Game tab switching - guaranteed to work
+        function setupGameTabs() {
+            const gameTabs = document.querySelectorAll('.game-tab');
+            const games = document.querySelectorAll('.game');
+            
+            gameTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs and games
+                    gameTabs.forEach(t => t.classList.remove('active'));
+                    games.forEach(g => g.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding game
+                    this.classList.add('active');
+                    const gameId = this.getAttribute('data-game');
+                    const gameElement = document.getElementById(`${gameId}-game`);
+                    if (gameElement) {
+                        gameElement.classList.add('active');
                     }
                 });
-            } else {
-                setTimeout(ensureScriptsLoaded, 100);
-            }
+            });
         }
 
-        ensureScriptsLoaded();
+        // Initialize the tab functionality immediately
+        setupGameTabs();
+
+        // Load other scripts after the tabs are working
+        function loadScript(src, callback) {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = callback;
+            document.body.appendChild(script);
+        }
+
+        // Load optional effects scripts
+        loadScript('https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js', function() {
+            console.log('Confetti loaded');
+        });
+
+        // Your main game logic would be in script.js
+        loadScript('script.js', function() {
+            console.log('Main game script loaded');
+        });
     });
     </script>
-    <script src="script.js"></script>
 </body>
 </html>
