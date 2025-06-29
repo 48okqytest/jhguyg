@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Global variables
-    let balance = 1000;
+    let balance = 100000;
     let currentGame = 'slots';
     let coinChoice = null;
     let rocketInterval;
