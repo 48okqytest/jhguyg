@@ -155,6 +155,55 @@
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Game tab switching functionality
+        const gameTabs = document.querySelectorAll('.game-tab');
+        const games = document.querySelectorAll('.game');
+        
+        gameTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs and games
+                gameTabs.forEach(t => t.classList.remove('active'));
+                games.forEach(g => g.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding game
+                this.classList.add('active');
+                const gameId = this.getAttribute('data-game');
+                document.getElementById(`${gameId}-game`).classList.add('active');
+            });
+        });
+
+        // Make sure all external scripts are loaded
+        function ensureScriptsLoaded() {
+            if (typeof particlesJS === 'function' && typeof confetti === 'function') {
+                // Initialize particles.js if it's loaded
+                particlesJS('particles-js', {
+                    particles: {
+                        number: { value: 80, density: { enable: true, value_area: 800 } },
+                        color: { value: "#6c5ce7" },
+                        shape: { type: "circle" },
+                        opacity: { value: 0.5, random: true },
+                        size: { value: 3, random: true },
+                        line_linked: { enable: true, distance: 150, color: "#6c5ce7", opacity: 0.3, width: 1 },
+                        move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out" }
+                    },
+                    interactivity: {
+                        detect_on: "canvas",
+                        events: {
+                            onhover: { enable: true, mode: "repulse" },
+                            onclick: { enable: true, mode: "push" }
+                        }
+                    }
+                });
+            } else {
+                setTimeout(ensureScriptsLoaded, 100);
+            }
+        }
+
+        ensureScriptsLoaded();
+    });
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
