@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Global variables
+    // Game state
     let balance = 1000;
     let currentGame = 'slots';
     let coinChoice = null;
@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let rocketMultiplier = 1;
     let rocketPosition = 0;
     let rocketExploded = false;
+    const rocketSpeed = 1.5; // Slower speed for better control
+    const explosionBaseChance = 0.002; // Lower base chance of explosion
+    const explosionIncreaseRate = 0.0005; // Gradual increase
 
     // DOM elements
     const balanceElement = document.getElementById('balance');
@@ -17,29 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeModalBtn = document.querySelector('.close-modal');
     const balanceOptions = document.querySelectorAll('.balance-option');
     const sadFace = document.getElementById('sad-face');
-    const confettiContainer = document.getElementById('confetti');
-
-    // Initialize particles.js
-    if (typeof particlesJS !== 'undefined') {
-        particlesJS('particles-js', {
-            particles: {
-                number: { value: 80, density: { enable: true, value_area: 800 } },
-                color: { value: "#6c5ce7" },
-                shape: { type: "circle" },
-                opacity: { value: 0.5, random: true },
-                size: { value: 3, random: true },
-                line_linked: { enable: true, distance: 150, color: "#6c5ce7", opacity: 0.3, width: 1 },
-                move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out" }
-            },
-            interactivity: {
-                detect_on: "canvas",
-                events: {
-                    onhover: { enable: true, mode: "repulse" },
-                    onclick: { enable: true, mode: "push" }
-                }
-            }
-        });
-    }
 
     // Initialize the app
     init();
@@ -66,10 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Add active class to clicked tab and corresponding game
                 this.classList.add('active');
                 currentGame = this.dataset.game;
-                const gameElement = document.getElementById(`${currentGame}-game`);
-                if (gameElement) {
-                    gameElement.classList.add('active');
-                }
+                document.getElementById(`${currentGame}-game`).classList.add('active');
                 
                 // Reset any game states when switching
                 resetRocketGame();
@@ -142,7 +119,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     showResultMessage(resultMessage, `JACKPOT! 777! You won ${winAmount}`, 'win');
                     triggerConfetti();
                     triggerFloatingCoins(30);
-                    playSound('win');
                 } else if (values[0] === values[1] && values[1] === values[2]) {
                     // All three match - big win (5x)
                     const winAmount = bet * 5;
@@ -150,19 +126,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     updateBalance();
                     showResultMessage(resultMessage, `TRIPLE! You won ${winAmount}`, 'win');
                     triggerConfetti();
-                    playSound('win');
                 } else if (values[0] === values[1] || values[1] === values[2] || values[0] === values[2]) {
                     // Two match - small win (2x)
                     const winAmount = bet * 2;
                     balance += winAmount;
                     updateBalance();
                     showResultMessage(resultMessage, `DOUBLE! You won ${winAmount}`, 'win');
-                    playSound('win');
                 } else {
                     // No matches - lose
                     showResultMessage(resultMessage, `You lost ${bet}`, 'lose');
                     showSadFace();
-                    playSound('lose');
                 }
             });
         });
@@ -236,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Disable launch button, enable cashout
             launchBtn.disabled = true;
-            launchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> FLYING';
+            launchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> LAUNCHING';
             cashoutBtn.disabled = false;
             
             // Reset rocket position
@@ -249,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
             rocketInterval = setInterval(function() {
                 if (rocketExploded) return;
                 
-                rocketPosition += 2;
+                rocketPosition += rocketSpeed;
                 rocket.style.bottom = `${rocketPosition}px`;
                 
                 // Calculate current multiplier based on position
@@ -258,8 +231,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update cashout button
                 cashoutBtn.innerHTML = `<i class="fas fa-hand-holding-usd"></i> CASHOUT ${rocketMultiplier.toFixed(1)}x`;
                 
-                // Random chance to explode increases with height
-                const explosionChance = rocketPosition / 1000;
+                // Dynamic explosion chance - starts very low and increases gradually
+                const explosionChance = explosionBaseChance + (rocketPosition / 250) * explosionIncreaseRate;
                 if (Math.random() < explosionChance) {
                     explodeRocket();
                 }
@@ -291,9 +264,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Animate rocket flying away
             rocketExploded = true;
-            playSound('win');
             
-            if (rocketMultiplier >= 5) {
+            if (rocketMultiplier >= 2) {
                 triggerConfetti();
             }
             
@@ -318,7 +290,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show explosion animation
             rocket.innerHTML = '💥';
             rocket.style.fontSize = '40px';
-            playSound('explosion');
             
             setTimeout(function() {
                 rocket.innerHTML = '<i class="fas fa-rocket"></i>';
@@ -409,7 +380,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Flip the coin
             coin.classList.add('flipping');
-            playSound('flip');
             
             // Determine result after animation
             setTimeout(function() {
@@ -425,11 +395,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (winAmount > bet * 3) {
                         triggerConfetti();
                     }
-                    playSound('win');
                 } else {
                     showResultMessage(resultMessage, `You lost ${bet}!`, 'lose');
                     showSadFace();
-                    playSound('lose');
                 }
                 
                 // Reset for next flip
@@ -465,12 +433,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupBalanceModal() {
         addBalanceBtn.addEventListener('click', function() {
             addBalanceModal.classList.add('active');
-            playSound('click');
         });
         
         closeModalBtn.addEventListener('click', function() {
             addBalanceModal.classList.remove('active');
-            playSound('click');
         });
         
         balanceOptions.forEach(option => {
@@ -479,7 +445,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 balance += amount;
                 updateBalance();
                 addBalanceModal.classList.remove('active');
-                playSound('coins');
+                triggerConfetti();
                 triggerFloatingCoins(10);
             });
         });
@@ -551,21 +517,5 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 3000);
             }, i * 100);
         }
-    }
-
-    function playSound(type) {
-        // In a real implementation, you would play actual sound files here
-        // For this demo, we'll just simulate it with console logs
-        const sounds = {
-            'win': { pitch: 1.5, duration: 0.5 },
-            'lose': { pitch: 0.8, duration: 0.3 },
-            'click': { pitch: 1.2, duration: 0.1 },
-            'coins': { pitch: 1.8, duration: 0.8 },
-            'explosion': { pitch: 0.5, duration: 1.0 },
-            'flip': { pitch: 1.0, duration: 1.5 }
-        };
-        
-        // This would be replaced with actual audio playback
-        console.log(`Playing ${type} sound`);
     }
 });
