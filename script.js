@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Global variables
-    let balance = 100000;
+    let balance = 1000;
     let currentGame = 'slots';
     let coinChoice = null;
     let rocketInterval;
@@ -16,6 +16,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const addBalanceModal = document.getElementById('add-balance-modal');
     const closeModalBtn = document.querySelector('.close-modal');
     const balanceOptions = document.querySelectorAll('.balance-option');
+    const sadFace = document.getElementById('sad-face');
+    const confettiContainer = document.getElementById('confetti');
+
+    // Initialize particles.js
+    particlesJS('particles-js', {
+        particles: {
+            number: { value: 80, density: { enable: true, value_area: 800 } },
+            color: { value: "#6c5ce7" },
+            shape: { type: "circle" },
+            opacity: { value: 0.5, random: true },
+            size: { value: 3, random: true },
+            line_linked: { enable: true, distance: 150, color: "#6c5ce7", opacity: 0.3, width: 1 },
+            move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out" }
+        },
+        interactivity: {
+            detect_on: "canvas",
+            events: {
+                onhover: { enable: true, mode: "repulse" },
+                onclick: { enable: true, mode: "push" }
+            }
+        }
+    });
 
     // Initialize the app
     init();
@@ -85,6 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (bet > balance) {
                 showResultMessage(resultMessage, `You don't have enough balance!`, 'lose');
+                showSadFace();
                 return;
             }
             
@@ -94,6 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Disable button during spin
             spinBtn.disabled = true;
+            spinBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SPINNING';
             
             // Spin each reel with different durations for a more natural effect
             spinReel(reels[0], 1000);
@@ -101,24 +125,39 @@ document.addEventListener('DOMContentLoaded', function() {
             spinReel(reels[2], 1400, function() {
                 // All reels have stopped
                 spinBtn.disabled = false;
+                spinBtn.innerHTML = '<i class="fas fa-redo"></i> SPIN';
                 
                 // Check for win
                 const values = reels.map(reel => reel.textContent);
-                if (values[0] === values[1] && values[1] === values[2]) {
-                    // All three match - big win
+                if (values[0] === '7' && values[1] === '7' && values[2] === '7') {
+                    // Three 7s - mega win (20x)
+                    const winAmount = bet * 20;
+                    balance += winAmount;
+                    updateBalance();
+                    showResultMessage(resultMessage, `JACKPOT! 777! You won ${winAmount}`, 'win');
+                    triggerConfetti();
+                    triggerFloatingCoins(30);
+                    playSound('win');
+                } else if (values[0] === values[1] && values[1] === values[2]) {
+                    // All three match - big win (5x)
                     const winAmount = bet * 5;
                     balance += winAmount;
                     updateBalance();
-                    showResultMessage(resultMessage, `JACKPOT! You won ${winAmount}`, 'win');
+                    showResultMessage(resultMessage, `TRIPLE! You won ${winAmount}`, 'win');
+                    triggerConfetti();
+                    playSound('win');
                 } else if (values[0] === values[1] || values[1] === values[2] || values[0] === values[2]) {
-                    // Two match - small win
+                    // Two match - small win (2x)
                     const winAmount = bet * 2;
                     balance += winAmount;
                     updateBalance();
-                    showResultMessage(resultMessage, `You won ${winAmount}`, 'win');
+                    showResultMessage(resultMessage, `DOUBLE! You won ${winAmount}`, 'win');
+                    playSound('win');
                 } else {
                     // No matches - lose
                     showResultMessage(resultMessage, `You lost ${bet}`, 'lose');
+                    showSadFace();
+                    playSound('lose');
                 }
             });
         });
@@ -182,6 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (bet > balance) {
                 showResultMessage(resultMessage, `You don't have enough balance!`, 'lose');
+                showSadFace();
                 return;
             }
             
@@ -191,6 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Disable launch button, enable cashout
             launchBtn.disabled = true;
+            launchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> FLYING';
             cashoutBtn.disabled = false;
             
             // Reset rocket position
@@ -210,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 rocketMultiplier = 1 + Math.floor(rocketPosition / 50) * 0.2;
                 
                 // Update cashout button
-                cashoutBtn.textContent = `CASHOUT ${rocketMultiplier.toFixed(1)}x`;
+                cashoutBtn.innerHTML = `<i class="fas fa-hand-holding-usd"></i> CASHOUT ${rocketMultiplier.toFixed(1)}x`;
                 
                 // Random chance to explode increases with height
                 const explosionChance = rocketPosition / 1000;
@@ -240,10 +281,17 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Reset buttons
             launchBtn.disabled = false;
+            launchBtn.innerHTML = '<i class="fas fa-paper-plane"></i> LAUNCH';
             cashoutBtn.disabled = true;
             
             // Animate rocket flying away
             rocketExploded = true;
+            playSound('win');
+            
+            if (rocketMultiplier >= 5) {
+                triggerConfetti();
+            }
+            
             setTimeout(function() {
                 rocket.style.bottom = '250px';
                 rocket.style.opacity = '0';
@@ -265,6 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show explosion animation
             rocket.innerHTML = '💥';
             rocket.style.fontSize = '40px';
+            playSound('explosion');
             
             setTimeout(function() {
                 rocket.innerHTML = '<i class="fas fa-rocket"></i>';
@@ -273,9 +322,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Reset buttons
                 launchBtn.disabled = false;
+                launchBtn.innerHTML = '<i class="fas fa-paper-plane"></i> LAUNCH';
                 cashoutBtn.disabled = true;
                 
                 showResultMessage(resultMessage, `Rocket exploded! You lost ${betAmount.textContent}`, 'lose');
+                showSadFace();
             }, 1000);
         }
     }
@@ -290,6 +341,7 @@ document.addEventListener('DOMContentLoaded', function() {
         rocket.style.transition = 'bottom 0.1s linear';
         
         document.getElementById('launch-btn').disabled = false;
+        document.getElementById('launch-btn').innerHTML = '<i class="fas fa-paper-plane"></i> LAUNCH';
         document.getElementById('cashout-btn').disabled = true;
         document.getElementById('rocket-result').classList.remove('show');
     }
@@ -335,6 +387,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (bet > balance) {
                 showResultMessage(resultMessage, `You don't have enough balance!`, 'lose');
+                showSadFace();
                 return;
             }
             
@@ -346,10 +399,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Disable buttons during flip
             flipBtn.disabled = true;
+            flipBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> FLIPPING';
             choiceButtons.forEach(btn => btn.disabled = true);
             
             // Flip the coin
             coin.classList.add('flipping');
+            playSound('flip');
             
             // Determine result after animation
             setTimeout(function() {
@@ -362,15 +417,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     balance += Math.floor(winAmount);
                     updateBalance();
                     showResultMessage(resultMessage, `You won ${Math.floor(winAmount)}!`, 'win');
+                    if (winAmount > bet * 3) {
+                        triggerConfetti();
+                    }
+                    playSound('win');
                 } else {
                     showResultMessage(resultMessage, `You lost ${bet}!`, 'lose');
+                    showSadFace();
+                    playSound('lose');
                 }
                 
                 // Reset for next flip
                 setTimeout(function() {
                     coin.classList.remove('flipping');
-                    choiceButtons.forEach(btn => btn.disabled = false);
+                    choiceButtons.forEach(btn => {
+                        btn.disabled = false;
+                        btn.classList.remove('selected');
+                    });
                     flipBtn.disabled = false;
+                    flipBtn.innerHTML = '<i class="fas fa-sync-alt"></i> FLIP';
+                    coinChoice = null;
                 }, 500);
             }, 1500);
         });
@@ -386,6 +452,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         document.getElementById('flip-btn').disabled = true;
+        document.getElementById('flip-btn').innerHTML = '<i class="fas fa-sync-alt"></i> FLIP';
         document.getElementById('coin-result').classList.remove('show');
         coinChoice = null;
     }
@@ -393,10 +460,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupBalanceModal() {
         addBalanceBtn.addEventListener('click', function() {
             addBalanceModal.classList.add('active');
+            playSound('click');
         });
         
         closeModalBtn.addEventListener('click', function() {
             addBalanceModal.classList.remove('active');
+            playSound('click');
         });
         
         balanceOptions.forEach(option => {
@@ -405,12 +474,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 balance += amount;
                 updateBalance();
                 addBalanceModal.classList.remove('active');
+                playSound('coins');
+                triggerFloatingCoins(10);
             });
         });
     }
 
     function updateBalance() {
         balanceElement.textContent = balance;
+        
+        // Animate balance change
+        balanceElement.classList.add('balance-update');
+        setTimeout(() => {
+            balanceElement.classList.remove('balance-update');
+        }, 500);
         
         // Update bet amounts if they exceed balance
         const betAmounts = document.querySelectorAll('.bet-amount span');
@@ -433,5 +510,55 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             element.classList.remove('show');
         }, 5000);
+    }
+
+    function showSadFace() {
+        sadFace.classList.add('show');
+        setTimeout(() => {
+            sadFace.classList.remove('show');
+        }, 2000);
+    }
+
+    function triggerConfetti() {
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#6c5ce7', '#00cec9', '#fdcb6e', '#00b894']
+        });
+    }
+
+    function triggerFloatingCoins(count) {
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                const coin = document.createElement('div');
+                coin.className = 'floating-coin';
+                coin.innerHTML = '<i class="fas fa-coins"></i>';
+                coin.style.left = `${Math.random() * 100}%`;
+                coin.style.top = '100vh';
+                coin.style.color = ['#fdcb6e', '#00cec9', '#6c5ce7'][Math.floor(Math.random() * 3)];
+                document.body.appendChild(coin);
+                
+                setTimeout(() => {
+                    document.body.removeChild(coin);
+                }, 3000);
+            }, i * 100);
+        }
+    }
+
+    function playSound(type) {
+        // In a real implementation, you would play actual sound files here
+        // For this demo, we'll just simulate it with console logs
+        const sounds = {
+            'win': { pitch: 1.5, duration: 0.5 },
+            'lose': { pitch: 0.8, duration: 0.3 },
+            'click': { pitch: 1.2, duration: 0.1 },
+            'coins': { pitch: 1.8, duration: 0.8 },
+            'explosion': { pitch: 0.5, duration: 1.0 },
+            'flip': { pitch: 1.0, duration: 1.5 }
+        };
+        
+        // This would be replaced with actual audio playback
+        console.log(`Playing ${type} sound`);
     }
 });
